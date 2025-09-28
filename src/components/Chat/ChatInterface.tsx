@@ -11,7 +11,9 @@ const ChatInterface: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   useEffect(() => {
@@ -35,36 +37,20 @@ const ChatInterface: React.FC = () => {
     chatDispatch({ type: 'SET_LOADING', payload: true });
 
     setTimeout(() => {
-      const mockCode = `const TodoInput = () => {
-  const [task, setTask] = React.useState('');
+      const mockCode = `export default function HelloWorld() {
   return (
-    <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">To-Do Input</h2>
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        console.log('Added task:', task);
-        setTask('');
-      }} className="mb-4">
-        <div className="flex space-x-2">
-          <input
-            type="text"
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-            placeholder="輸入任務..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            添加
-          </button>
-        </div>
-      </form>
+    <div className="flex items-center justify-center min-h-screen bg-blue-50">
+      <div className="text-center p-8 bg-white rounded-lg shadow-md">
+        <h1 className="text-4xl font-bold text-blue-600 mb-4">
+          Hello World!
+        </h1>
+        <p className="text-gray-600">
+          這是我的第一個 React 應用程式
+        </p>
+      </div>
     </div>
   );
-};
-<TodoInput />`;
+}`;
 
       const botMessage: Message = {
         role: 'bot',
@@ -84,21 +70,23 @@ const ChatInterface: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-lg">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {chatState.messages.map((message, index) => (
-          <MessageBubble
-            key={index}
-            message={message}
-            isUser={message.role === 'user'}
-          />
-        ))}
-        {chatState.isLoading && (
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
+    <div className="flex flex-col h-full bg-white">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col-reverse">
+        <div>
+          {chatState.isLoading && (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            </div>
+          )}
+          {chatState.messages.map((message, index) => (
+            <MessageBubble
+              key={index}
+              message={message}
+              isUser={message.role === 'user'}
+            />
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
       <form onSubmit={handleSubmit} className="p-4 border-t">
         <div className="flex space-x-2">

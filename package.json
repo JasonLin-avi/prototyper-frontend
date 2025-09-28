@@ -45,9 +45,20 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/preset-react": "^7.27.1",
     "@craco/craco": "^7.1.0",
     "autoprefixer": "^10.4.21",
+    "babel-jest": "^30.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[tj]sx?$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!react-codemirror2|react-live).+\\.[tj]sx?$"
+    ]
   }
 }
