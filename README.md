@@ -1,46 +1,97 @@
-# Getting Started with Create React App
+# UI Prototyping Chatbot
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 專案概述
 
-## Available Scripts
+此專案旨在建立一個基於 React 和 TypeScript 的前端應用，讓使用者透過聊天機器人 (Chatbot) 互動，即可根據自然語言描述生成 UI 組件。應用聚焦於前端實現，假定後端代理 (Backend Agent) 負責 AI 邏輯處理，前端僅定義與後端的介面。生成的 UI 將以 React 組件程式碼形式呈現，並提供即時預覽功能，支援迭代修改。
 
-In the project directory, you can run:
+目標是快速原型開發工具，幫助開發者或設計師透過對話方式產生可重用的 UI 程式碼。
 
-### `npm start`
+## 核心功能
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. **聊天介面**：使用者輸入自然語言描述 UI 需求，例如「建立一個包含使用者名稱和密碼的登入表單，包含提交按鈕」。
+2. **AI 驅動生成**：Chatbot 解析輸入，透過後端代理生成對應的 React 組件 TypeScript 程式碼。
+3. **程式碼顯示**：呈現生成的完整 React 組件程式碼，使用程式碼編輯器讓使用者檢視和複製。
+4. **UI 預覽**：在聊天介面旁渲染生成的 UI 組件，提供即時視覺反饋。
+5. **迭代互動**：使用者可回饋修改需求（如「將按鈕改為藍色」），Chatbot 基於先前上下文更新程式碼和預覽。
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 技術堆疊
 
-### `npm test`
+- **前端框架**：React (v18+) + TypeScript
+- **聊天介面**：使用 custom React hooks 實現互動式對話
+- **程式碼顯示**：react-codemirror2 呈現高亮程式碼
+- **UI 預覽**：使用 react-live 安全渲染組件
+- **樣式**：Tailwind CSS 美化介面
+- **建置工具**：Vite (快速開發伺服器和打包)
+- **狀態管理**：React Context 管理聊天歷史和生成狀態
+- **後端整合**：僅定義 RESTful API 介面，呼叫後端代理處理 AI 生成 (無直接 AI API 暴露)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 系統架構
 
-### `npm run build`
+應用分為前端和假定後端兩部分：
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **前端**：處理使用者輸入、顯示聊天、程式碼和預覽。透過 API 與後端通訊。
+- **後端代理** (假定)：接收 UI 描述，整合 AI (如 OpenAI GPT-4) 生成 React 程式碼，返回 JSON 格式結果。
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### API 介面定義
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+前端與後端的通訊使用 POST /generate-ui 端點。
 
-### `npm run eject`
+**請求格式 (JSON)**：
+```json
+{
+  "prompt": "string",  // 使用者輸入的 UI 描述
+  "context": "string", // 可選，先前對話上下文 (用於迭代)
+  "framework": "react" // 固定為 React
+}
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+**回應格式 (JSON)**：
+```json
+{
+  "success": boolean,
+  "code": "string",    // 生成的 React 組件 TypeScript 程式碼
+  "previewProps": {    // 可選，用於預覽的 props
+    "componentName": "string"
+  },
+  "error": "string"    // 若失敗，錯誤訊息
+}
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+錯誤處理：若 API 失敗，顯示友好錯誤訊息並允許重試。
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 使用者互動流程
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+以下 Mermaid 圖描述主要流程：
 
-## Learn More
+```mermaid
+flowchart TD
+    A[使用者輸入 UI 描述] --> B[前端發送請求至後端 API]
+    B --> C[後端 AI 解析並生成 React 程式碼]
+    C --> D[返回程式碼至前端]
+    D --> E[顯示程式碼在編輯器]
+    E --> F[渲染 UI 預覽]
+    F --> G[使用者檢視並回饋修改]
+    G --> H{需修改?}
+    H -->|是| A
+    H -->|否| I[完成，允許匯出程式碼]
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 開發與部署
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. **環境設定**：安裝 Node.js v18+，使用 `npm install` 安裝依賴。
+2. **執行開發伺服器**：`npm run dev` (Vite)。
+3. **建置生產版本**：`npm run build`。
+4. **部署**：可部署至 Vercel 或 Netlify (前端靜態)，後端需獨立部署。
+
+## 未來擴展
+
+- 支援多框架 (Vue, HTML/CSS)。
+- 整合更多 AI 模型 (如 Grok)。
+- 添加 UI 組件庫整合 (Material-UI, Ant Design)。
+- 持久化聊天歷史 (localStorage 或後端資料庫)。
+
+此規格基於討論的核心功能和技術選擇。若需調整，請提供反饋。
+
+
+# web search MCP tool brightdata 
+```4706804f3591b0f0e17e252b79afbaf9e2be7844f8ab134a1c6386adfa16e3b7``` 
