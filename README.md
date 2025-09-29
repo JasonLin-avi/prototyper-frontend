@@ -91,7 +91,3 @@ flowchart TD
 - 持久化聊天歷史 (localStorage 或後端資料庫)。
 
 此規格基於討論的核心功能和技術選擇。若需調整，請提供反饋。
-
-
-# web search MCP tool brightdata 
-```4706804f3591b0f0e17e252b79afbaf9e2be7844f8ab134a1c6386adfa16e3b7``` 
